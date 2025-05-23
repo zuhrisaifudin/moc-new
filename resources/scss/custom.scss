@@ -1,0 +1,28 @@
+
+div.dataTables_wrapper div.dataTables_paginate {
+    margin-top: 1rem !important;
+    white-space: nowrap;
+    text-align: right;
+}
+
+
+.bg-low {
+    --tb-bg-opacity: 1;
+    background-color: #008001 !important;
+}
+.bg-low-moderate {
+    --tb-bg-opacity: 1;
+    background-color: #a6d785 !important;
+}
+.bg-moderate {
+    --tb-bg-opacity: 1;
+    background-color: #ffff01 !important;
+}
+.bg-moderate-high {
+    --tb-bg-opacity: 1;
+    background-color: #ffa000 !important;
+}
+.bg-high {
+    --tb-bg-opacity: 1;
+    background-color: #fe0000 !important;
+}
