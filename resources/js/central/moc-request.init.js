@@ -49,19 +49,27 @@ $(document).ready(function(){
                 name: "moc_requests.status",
                 orderable: false,
                 render: function (data) {
-                    const status = parseInt(data);
-                    if (status === 1) {
-                        return '<span class="badge bg-secondary-subtle text-secondary">Pending</span>';
-                    } else if (status === 2) {
-                        return '<span class="badge bg-warning-subtle text-warning">Submit</span>';
-                    } else if (status === 3) {
-                        return '<span class="badge bg-success-subtle text-success">Disetujui</span>';
-                    } else if (status === 4) {
-                        return '<span class="badge bg-danger-subtle text-danger">Ditolak</span>';
-                    } else {
-                        return '<span class="badge bg-light text-dark">Tidak diketahui</span>';
-                    }
-                }
+                    if (!data) return "-";
+
+                    const stages = {
+                        1: "Pending",
+                        2: "Submission",
+                        3: "Approved",
+                        4: "Reject",
+                    };
+
+                    const badgeClasses = {
+                        1: "secondary",
+                        2: "primary",
+                        3: "success",
+                        4: "danger",
+                    };
+
+                    const stageLabel = stages[data] || `Stage ${data}`;
+                    const badgeClass = badgeClasses[data] || "dark";
+
+                    return `<span class="badge bg-${badgeClass}">${stageLabel}</span>`;
+                },
             },
             {
                 data: "type_of_change",
@@ -153,24 +161,26 @@ $(document).ready(function(){
                     if (!data) return "-";
 
                     const stages = {
-                        submission: "Submission",
-                        review: "Review",
-                        checklist1: "Checklist 1",
-                        checklist2: "Checklist 2",
-                        approval: "Approval",
-                        closed: "Closed"
+                        1: "Pending",
+                        2: "Submission",
+                        3: "Review",
+                        4: "Checklist 1",
+                        5: "Checklist 2",
+                        6: "Approval",
+                        7: "Closed"
                     };
 
                     const badgeClasses = {
-                        submission: "primary",
-                        review: "info",
-                        checklist1: "warning",
-                        checklist2: "warning",
-                        approval: "success",
-                        closed: "secondary"
+                        1: "secondary",
+                        2: "primary",
+                        3: "info",
+                        4: "warning",
+                        5: "warning",
+                        6: "success",
+                        7: "dark"
                     };
 
-                    const stageLabel = stages[data] || data.replace('_', ' ').toUpperCase();
+                    const stageLabel = stages[data] || `Stage ${data}`;
                     const badgeClass = badgeClasses[data] || "dark";
 
                     return `<span class="badge bg-${badgeClass}">${stageLabel}</span>`;
@@ -242,6 +252,9 @@ $(document).ready(function(){
         });
     });
 
+    
+    
+
     $datatable_moc_request.on("click", ".delete-item", function (e) {
         e.preventDefault();
         var $val = $(this).data("id");
@@ -298,6 +311,68 @@ $(document).ready(function(){
                     });
                 }
             });
+    });
+
+
+    $datatable.on("click", ".send-item", function (e){
+        e.preventDefault();
+        var $val = $(this).data("id");
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: 'btn btn-success mx-3',
+                cancelButton: 'btn btn-danger'
+            },
+            buttonsStyling: false
+        })
+        swalWithBootstrapButtons.fire({
+            title: 'Kirim Permohonan?',
+            text: "Anda yakin mengirim Permohonan ini ke Fungsi Pengusul?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2ab57d',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yakin'
+        }).then((result)=>{
+            if (result.isConfirmed){
+                $.ajax({
+                    method: "POST",
+                    url: `${$url_detail_send_moc_request}/${$val}`,
+                    data: {
+                       _token: $('meta[name="x-token"]').attr("content"),
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            html: response.message,
+                            showConfirmButton: false,
+                            timer: 3000,
+                        })
+                         $datatable.ajax.reload();
+                    },
+                    error: function(error) {
+                        console.log(error);
+                        Swal.fire({
+                            icon: "error",
+                            title: "WAH!",
+                            html:
+                                "<h5>Mohon maaf. Terjadi kesalahan</h5> <code>" +
+                                error.responseJSON.message +
+                                "</code>",
+                            showConfirmButton: false,
+                        });
+                    }
+                });
+            } else if (
+                result.dismiss === Swal.DismissReason.cancel
+            ) {
+                swalWithBootstrapButtons.fire(
+                    'Batal Pengajuan',
+                    'Permohonan batal di submit:)',
+                    'error'
+                )
+            }
+        });
     });
 
 

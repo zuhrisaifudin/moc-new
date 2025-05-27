@@ -39,7 +39,11 @@ return new class extends Migration
             $table->json('examiner_team')->nullable();
 
             // Status dan Tracking
-            $table->enum('current_stage', ['submission', 'review', 'checklist1', 'checklist2', 'approval', 'closed'])->nullable();
+            $table->integer('current_stage')   
+                ->default(1)
+                ->nullable()
+                ->comment('1=Pending, 2=Submission, 3=Review, 4=Checklist1, 5=Checklist2, 6=Approval, 7=Closed');
+
             $table->boolean('is_temporary')->nullable();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();

@@ -44,11 +44,14 @@ Route::middleware(['auth', 'is_active'])->group(function (){
         Route::get('/', [MocRequestController::class, 'index'])->name('central-moc-request-index');
         Route::post('/ajax/get-moc-request', [MocRequestController::class,'getAllMocRequest'])->name('central-get-moc-request-ajax');
         Route::get('/create', [MocRequestController::class, 'create'])->name('central-moc-request-create-pages');
-        Route::post('/tambah', [MocRequestController::class, 'store'])->name('central-moc-request-add');
+        Route::post('/tambah', [MocRequestController::class, 'addMocRequest'])->name('central-moc-request-add');
         Route::get('/show/{id}', [MocRequestController::class, 'getById'])->name('central-moc-request-edit-pages');
         Route::get('/ajax/delete-moc-request/{id}', [MocRequestController::class, 'onDeleteMocRequest'])->name('central-delete-moc-request-ajax');
+        Route::get('/ajax/detail-moc-request/{id}', [MocRequestController::class, 'onDetailMapsMocRequest'])->name('central-detail-maps-moc-request-ajax');
 
-        Route::get('/ajax/detail-user/{id}', [MocRequestController::class, 'onDetailMapsMocRequest'])->name('central-detail-maps-moc-request-ajax');
+        Route::post('/ajax/detail-moc-request/send/{id}', [MocRequestController::class, 'onDetailSendMocRequest'])->name('console-detail-send-moc-request-ajax');
+        Route::get('/ajax/get-user', [MocRequestController::class,'onDetailUserApprovalRequest'])->name('central-get-user-approval-line-ajax');
+        Route::post('/ajax/get-user-approval', [MocRequestController::class,'getAllUserApprovalRequest'])->name('central-get-user-approval-ajax');
     });
 
 

@@ -87,6 +87,12 @@ class MocRequest extends Model
         return $this->hasMany(MocHistory::class);
     }
 
+
+    public function approvalWorkflows()
+    {
+        return $this->hasMany(ApprovalWorkflow::class);
+    }
+
     // generate reference number
 
     public static function generateNumberFromCount()

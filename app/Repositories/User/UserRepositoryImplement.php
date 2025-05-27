@@ -60,4 +60,11 @@ class UserRepositoryImplement extends Eloquent implements UserRepository{
     public function countSoftDeletedUsers(): int{
         return $this->model->onlyTrashed()->count();
     }
+
+    public function getActiveUsers(){
+        return $this->model
+        ->select('id', 'name', 'position')
+        ->where('is_active', 1)
+        ->get();
+    }
 }

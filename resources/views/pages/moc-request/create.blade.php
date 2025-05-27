@@ -178,6 +178,101 @@
                                     </div>
                                 </div>
 
+                                <div class="card mb-4">
+                                    <div class="card-header bg-primary text-white pb-3">
+                                        Kendali Approval
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <table class="table table-nowrap">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">No</th>
+                                                        <th scope="col">Nama</th>
+                                                        <th scope="col">Jabatan</th>
+                                                        <th scope="col">Sebagai</th>
+                                                        <th scope="col">Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                               <tbody id="approvalTable">
+                                                    <tr>
+                                                        <th scope="row">1
+                                                            
+                                                        </th>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Fungsi Pengusul</td>
+                                                        <td>
+                                                            <div class="hstack gap-3 fs-base">
+                                                                <button  class="btn btn-sm btn-subtle-info add-aproval-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Tambah Approval">
+                                                                    <i class="ri-user-follow-fill align-bottom"></i>
+                                                                </button>
+                                                                <a href="javascript:void(0);" class="link-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Approval">
+                                                                    <i class="ri-delete-bin-5-line"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">2
+                                                        
+                                                        </th>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Fungsi Pemeriksa</td>
+                                                        <td>
+                                                            <div class="hstack gap-3 fs-base">
+                                                                <button  class="btn btn-sm btn-subtle-info add-aproval-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Tambah Approval">
+                                                                    <i class="ri-user-follow-fill align-bottom"></i>
+                                                                </button>
+                                                                <a href="javascript:void(0);" class="link-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Approval">
+                                                                    <i class="ri-delete-bin-5-line"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">3
+                                                          
+                                                        </th>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>MOC Controller</td>
+                                                        <td>
+                                                            <div class="hstack gap-3 fs-base">
+                                                                <button  class="btn btn-sm btn-subtle-info add-aproval-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Tambah Approval">
+                                                                    <i class="ri-user-follow-fill align-bottom"></i>
+                                                                </button>
+                                                                <a href="javascript:void(0);" class="link-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Approval">
+                                                                    <i class="ri-delete-bin-5-line"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">4
+                                                           
+                                                        </th>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>Fungsi Persetujuan</td>
+                                                        <td>
+                                                            <div class="hstack gap-3 fs-base">
+                                                                <button  class="btn btn-sm btn-subtle-info add-aproval-line" data-bs-toggle="tooltip" data-bs-placement="top" title="Tambah Approval">
+                                                                    <i class="ri-user-follow-fill align-bottom"></i>
+                                                                </button>
+                                                                <a href="javascript:void(0);" class="link-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Approval">
+                                                                    <i class="ri-delete-bin-5-line"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="d-flex justify-content-between">
                                     <a href="{{ route('central-moc-request-index') }}" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left me-2"></i>Kembali
@@ -198,15 +293,73 @@
         </div>
     </div>
 
-
+    <x-modal id="add-approval" title="Pilih Daftar Kendali Approval" backdrop="true" size="modal-lg" >
+        <div class="text-center">
+            <span class="spinner-border flex-shrink-0" role="status">
+                <span class="visually-hidden text-primary-emphasis">Loading...</span>
+            </span>
+        </div>
+    </x-modal>
 
 @endsection
 
 @section('script')
     <script src="https://digio.pgn.co.id/digio/moc/assets/tinymce/js/tinymce/tinymce.min.js" referrerpolicy="origin"></script>
     <script>
+            var $url_detail_aproval_line = "{{ route('central-get-user-approval-line-ajax') }}";
 
-           
+
+
+            var $btn_add_moc = $("#btn-add-moc");
+            var $form = $('#form_permohonan');
+
+            $btn_add_moc.on("click", function (e) {
+                e.preventDefault();
+
+                let formData = new FormData($form[0]);
+
+                $("#spinner-add-moc").removeClass("d-none");
+                $btn_add_moc.attr("disabled", true);
+                $btn_add_moc.find(".btn-text").text("Mohon Tunggu...");
+
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',  
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $("#spinner-add-moc").addClass("d-none");
+                        $btn_add_moc.attr("disabled", false);
+                        $btn_add_moc.find(".btn-text").text("Simpan");
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            html: response.message,
+                            showConfirmButton: false,
+                            timer: 2000,
+                        }).then(function () {
+                            window.location.href = "{{ route('central-moc-request-index') }}";
+                        });
+                    },
+                    error: function (error) {
+                        $("#spinner-add-moc").addClass("d-none");
+                        $btn_add_moc.attr("disabled", false);
+                        $btn_add_moc.find(".btn-text").html("Coba Lagi");
+
+                        Swal.fire({
+                            icon: "error",
+                            title: "WAH!",
+                            html:
+                                "<h5>Mohon maaf. Terjadi kesalahan</h5> <code>" +
+                                (error.responseJSON?.message || 'Terjadi kesalahan tidak diketahui') +
+                                "</code>",
+                            showConfirmButton: false,
+                        });
+                    }
+                });
+            });
 
             // End Ajax Form
 
@@ -446,6 +599,99 @@
                 loadFormDataFromLocalStorage();
                 document.getElementById(formId).addEventListener('input', saveFormDataToLocalStorage);
             });
+
+            // Kendali Approval
+            $(".add-aproval-line").on("click", function (e) {
+                e.preventDefault();
+                selectedRow = $(this).closest('tr');
+                $.ajax({
+                    url: `${$url_detail_aproval_line}`,
+                    method: "GET",
+                    beforeSend: function () {
+                        $("#modal-add-approval").modal("show");
+                    },
+                    success: function (response) {
+                        $("#modal-add-approval .modal-body").html(response.content);
+                    },
+                    error: function (error) {
+                        let message = "";
+                        if (error.responseJSON.code === 2000) {
+                            message = error.responseJSON.message;
+                        } else {
+                            message =
+                                "<h5>Mohon maaf. Terjadi kesalahan</h5> <code>" +
+                                error.responseJSON.message +
+                                "</code>";
+                        }
+                        Swal.fire({
+                            icon: "error",
+                            title: "WAH!",
+                            html: message,
+                            showConfirmButton: false,
+                        });
+                    },
+                });
+            });
+
+            $(document).on('click', '.pilih-approval', function() {
+                if (!selectedRow) {
+                    alert("Pilih dulu baris approval di tabel utama!");
+                    return;
+                }
+
+                const id = $(this).data('id');
+                const name = $(this).data('name');
+                const position = $(this).data('position');
+
+                selectedRow.find('td').eq(0).text(name);
+                selectedRow.find('td').eq(1).text(position);
+
+                selectedRow.attr('data-approval-id', id);
+                const inputHidden = selectedRow.find('th input[type="hidden"]');
+                if (inputHidden.length) {
+                    inputHidden.val(id);
+                } else {
+                    // Kalau belum ada input hidden, kamu bisa buat dan append
+                    selectedRow.find('th').append(`<input type="hidden" name="user_id[]" value="${id}">`);
+                }
+
+                $('#modal-add-approval').modal('hide');
+            });
+
+            $(document).on('click', '.link-danger', function(e) {
+                e.preventDefault();
+
+                const row = $(this).closest('tr');
+                const namaKolom = row.find('td').eq(0).text().trim(); 
+
+                if (namaKolom === '') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Tidak bisa hapus',
+                        text: 'Kendali Approval belum ditentukan'
+                    });
+                    return; 
+                }
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus approval ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        row.find('td').eq(0).text(''); // Nama
+                        row.find('td').eq(1).text(''); // Jabatan
+                        row.removeAttr('data-approval-id');
+                        
+                        Swal.fire('Terhapus!', 'Data approval sudah dikosongkan.', 'success');
+                    }
+                });
+            });
+
+
+            
 
     </script>
     <script src="{{ URL::asset('build/libs/flatpickr/flatpickr.min.js') }}"></script>

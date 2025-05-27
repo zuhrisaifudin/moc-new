@@ -160,7 +160,6 @@
                 <div class="card-body">
                     <table id="datatable-moc-request" class="table nowrap table-hover align-middle" style="width:100%">
                         <thead class="table-light">
-
                         <tr>
                             <th>Aksi</th>
                             <th>Nomor MOC</th>
@@ -176,24 +175,22 @@
                             <th>Status Perubahan</th>
                             <th>Dokumen Referensi</th>
                             <th>Analysis Resiko</th>
-                            
-
                         </tr>
                         </thead>
-
                     </table>
                 </div>
             </div>
         </div><!--end col-->
     </div><!--end row-->
 
-      <x-modal id="add-tags-maps" title="Tags ID Asset" backdrop="true" size="modal-lg" >
+    <x-modal id="add-tags-maps" title="Tags ID Asset" backdrop="true" size="modal-lg" >
         <div class="text-center">
             <span class="spinner-border flex-shrink-0" role="status">
                 <span class="visually-hidden text-primary-emphasis">Loading...</span>
             </span>
         </div>
     </x-modal>
+
 
 @endsection
 
@@ -202,7 +199,10 @@
         var $datatable = null;
         var $url_get_moc_request = "{{ route('central-get-moc-request-ajax') }}";
         var $url_delete_moc_request = "{{route('central-delete-moc-request-ajax','')}}";
-         var $url_detail_maps_criteria= "{{route('central-detail-maps-moc-request-ajax','')}}";
+        var $url_detail_maps_criteria= "{{route('central-detail-maps-moc-request-ajax','')}}";
+        var $url_detail_aproval_line = "{{ route('central-get-user-approval-line-ajax') }}";
+        var $url_detail_send_moc_request = "{{route('console-detail-send-moc-request-ajax','')}}";
+         
     </script>
     <script src="{{ URL::asset('build/js/central/moc-request.init.js') }}"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>

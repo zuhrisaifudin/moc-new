@@ -2,32 +2,37 @@
 
 namespace App\Http\Controllers\Central\Transaction;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Region;
+use App\Models\District;
+use App\Models\MocRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use App\Repositories\MocRequest\MocRequestRepository;
 use App\Repositories\Region\RegionRepository;
-use Illuminate\Http\RedirectResponse;
-use App\Models\MocRequest;
-use App\Models\District;
-use App\Models\Region;
+use App\Notifications\MocRequestSentToFuctionRequest;
+use App\Repositories\MocRequest\MocRequestRepository;
+use App\Repositories\User\UserRepository;
 
 class MocRequestController extends Controller
 {
     private $MocRequestRepository;
     private $RegionRepository;
+    private $UserRepository;
 
     public function __construct(
         MocRequestRepository $MocRequestRepository,
-        RegionRepository $RegionRepository
+        RegionRepository $RegionRepository,
+        UserRepository $UserRepository
     ){
         $this->MocRequestRepository = $MocRequestRepository;
         $this->RegionRepository = $RegionRepository;
+        $this->UserRepository = $UserRepository;
     }
 
     public function index(Request $request)
@@ -52,6 +57,7 @@ class MocRequestController extends Controller
                     return view('pages.moc-request._action-table', [
                         'id' => Crypt::encryptString($mocRequest->id),
                         'moc_title' => $mocRequest->moc_title ?? '',
+                        'status' => $mocRequest->status ?? '',
                     ]);
                 })
                 ->make(true);
@@ -236,69 +242,74 @@ class MocRequestController extends Controller
         }
     }
 
+    public function onDetailSendMocRequest(Request $request, $id ){
+        try {
+            $id = Crypt::decryptString($request->id);
+            $moc = $this->MocRequestRepository->getMocRequestById($id);
+            if (!$moc) {
+                return response()->json([
+                    'code' => 2000,
+                    'message' => "Permohonan tidak ditemukan"
+                ], 400);
+            }
+            $data = $request->except("_token");
+            $data['status'] = 2;
+            $data['current_stage'] = 2;
+            if (!$moc->update($data)) {
+                return response()->json([
+                    'code' => 2000,
+                    'message' => "Permohonan gagal di rubah"
+                ], 400);
+            }
 
-    public function store(Request $request): RedirectResponse
-    {
-        //validate form
-        $request->validate([
-            'moc_title' => 'required',
-            'date' => 'required',
-            'region_id' => 'required',
-            'district_id' => 'required',
-            'risk_level' => 'required',
-            'type_of_change' => 'required',
-            'reference_document' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:20480', // 20MB
-            'risk_level_document' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,jpg,jpeg,png|max:20480', // 20MB
-        ],
-        [
-            'moc_title.required' => "Judul Permohonan harus diisi",
-            'date.required' => "Tanggal harus di pilih",
-            'region_id.required' => "Wilayah harus di pilih",
-            'district_id.required' => "Area harus di pilih",
-            'risk_level.required' => "Tingkat Risiko harus di pilih",
-            'type_of_change.required' => "Jenis Perubahan harus di pilih",
-            'reference_document.file' => "Dokumen Referensi harus berupa file yang valid",
-            'reference_document.mimes' => "Format Dokumen Referensi didukung (pdf, doc, docx, xls, xlsx, jpg, jpeg, png)",
-            'reference_document.max' => "Ukuran Dokumen Referensi maksimal 20MB",
-
-            'risk_level_document.file' => "Dokumen Tingkat Risiko harus berupa file yang valid",
-            'risk_level_document.mimes' => "Format Dokumen Tingkat Risiko didukung (pdf, doc, docx, xls, xlsx, jpg, jpeg, png)",
-            'risk_level_document.max' => "Ukuran Dokumen Tingkat Risiko maksimal 20MB",
-
-        ]);
-
-        //upload image
-    
-        $file = $request->file('reference_document');
-        $filename = $file->getClientOriginalName();
-        $path = $file->storeAs('uploads/moc/reference', $filename, 'public');
-        $reference_document = 'storage/' . $path;
-
-
-        $file = $request->file('risk_level_document');
-        $filename = $file->getClientOriginalName();
-        $path = $file->storeAs('uploads/moc/risklevel', $filename, 'public');
-        $risk_level_document = 'storage/' . $path;
-
-        //create product
-        MocRequest::create([
-            'date'         => $request->date,
-            'moc_title'    => $request->moc_title,
-            'risk_level'   => $request->risk_level,
-            'type_of_change' => $request->type_of_change,
-            'region_id'    => $request->region_id,
-            'district_id'  => $request->district_id,
-            'change_reason' => $request->change_reason,
-            'changed_parts' => $request->changed_parts,
-            'changed_to' => $request->changed_to,
-            
-            'reference_document' => $reference_document,
-            'risk_level_document' => $risk_level_document
-         
-        ]);
-
-        //redirect to index
-        return redirect()->route('central-moc-request-index')->with(['success' => 'Data Berhasil Disimpan!']);
+            $user = $moc->user; // Pastikan relasi user ada dan benar
+            if ($user && $user->email) {
+                $user->notify(new MocRequestSentToFuctionRequest($moc));
+            }
+            return response()->json([
+                'code' => 1000,
+                'message' => "Permohonan Berhasil di kirim ke Fungsi Pengusul."
+            ]);
+        }catch (\Exception $e) {
+            Log::error('Error in send MocRequest : ' . $e->getMessage());
+            return response()->json([
+                'code' => 2000,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
+
+    public function onDetailUserApprovalRequest(Request $request){
+        try {
+            return response()->json([
+                'code' => 1000,
+                'content' => view('pages.moc-request.aproval-workflow.user-aproval')->render()
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in get user approval component: ' . $e->getMessage());
+
+            return response()->json([
+                'code' => 2000,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
+
+    public function getAllUserApprovalRequest(Request $request){
+         try {
+           
+            $query = $this->UserRepository->getActiveUsers();
+            return  DataTables::of($query)->make(true);
+        } catch (\Exception $e) {
+            Log::error('Error in getAllMocRequest: ' . $e->getMessage());
+            return response()->json([
+                'code' => 2000,
+                'message' => 'Error retrieving MOC Request data',
+            ], 400);
+        }
+    }
+
+
 
 }
