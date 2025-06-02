@@ -9,6 +9,7 @@ class ApprovalWorkflow extends Model
     protected $fillable = [
         'moc_request_id',
         'user_id',
+        'role',
         'stage',
         'status',
         'note',

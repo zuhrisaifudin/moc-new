@@ -116,12 +116,12 @@
       
         <ul class="nav nav-tabs nav-tabs-custom nav-success nav-justified mb-3" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" data-bs-toggle="tab" href="#AllMoc" role="tab" aria-selected="false" tabindex="-1">
+                <a class="nav-link " href="{{ route('central-moc-request-index') }}">
                     Semua Permohonan
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" href="{{ route('central-my-moc-request-index') }}">
+                <a class="nav-link active">
                     Permohonan Saya  <span class="badge bg-success ms-1">{{ $myMocCount }}</span> 
                 </a>
             </li>
@@ -130,28 +130,13 @@
 
         <!-- Tab panes -->
         <div class="tab-content text-muted">
-            <div class="tab-pane active show" id="AllMoc" role="tabpanel">
-                <div class="row" id="invoiceList">
+            <div class="tab-pane show active" id="MyMoc" role="tabpanel">
+                 <div class="row" id="invoiceList">
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header bg-light pb-2">
                                 <h5 class="card-title mb-0">Semua Permohonan</h5>
                                 <div class="row align-items-center g-2 mt-2 mb-2">
-                                    <div class="col-xl-2 col-md-3">
-                                        <div>
-                                            <input type="date" class="form-control" id="exampleInputdate" placeholder="Select date range" data-provider="flatpickr" data-date-format="d M, Y" data-range-date="true">
-                                        </div>
-
-                                    </div>
-                                    <div class="col-lg-auto">
-                                        <select class="form-control" data-choices data-choices-search-false name="choices-select-sortlist" id="choices-select-sortlist">
-                                            <option value="">Tahun</option>
-                                            <option value="2025">2025</option>
-                                            <option value="2024">2024</option>
-                                            <option value="2023">2023</option>
-                                            <option value="2022">2022</option>
-                                        </select>
-                                    </div>
                                     <div class="col-lg-auto">
                                         <select class="form-control"  id="filter-status-perubahan">
                                             <option selected value="all">Semua Perubahan</option>
@@ -202,12 +187,12 @@
                     </div><!--end col-->
                 </div>
             </div>
+           
         </div>
     </div>
 
-    
 
-    <x-modal id="add-tags-maps" title="Tags ID Asset" backdrop="true" size="modal-lg" >
+      <x-modal id="add-approved-function-request" title="Approved Permohonan" backdrop="true" size="modal-lg" >
         <div class="text-center">
             <span class="spinner-border flex-shrink-0" role="status">
                 <span class="visually-hidden text-primary-emphasis">Loading...</span>
@@ -215,19 +200,21 @@
         </div>
     </x-modal>
 
+
+
 @endsection
 
 @section('script')
     <script>
         var $datatable = null;
-        var $url_get_moc_request = "{{ route('central-get-moc-request-ajax') }}";
+        var $url_get_my_moc_request = "{{ route('central-get-my-moc-request-ajax') }}";
         var $url_delete_moc_request = "{{route('central-delete-moc-request-ajax','')}}";
         var $url_detail_maps_criteria= "{{route('central-detail-maps-moc-request-ajax','')}}";
         var $url_detail_aproval_line = "{{ route('central-get-user-approval-line-ajax') }}";
         var $url_detail_send_moc_request = "{{route('console-detail-send-moc-request-ajax','')}}";
          
     </script>
-    <script src="{{ URL::asset('build/js/central/moc-request.init.js') }}"></script>
+    <script src="{{ URL::asset('build/js/central/my-moc-request.init.js') }}"></script>
     <script src="{{ URL::asset('build/js/app.js') }}"></script>
 @endsection
 

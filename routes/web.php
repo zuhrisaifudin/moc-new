@@ -9,7 +9,8 @@ use App\Http\Controllers\Central\Master\CriteriaController;
 use App\Http\Controllers\Central\Master\DescriptionChangeController;
 use App\Http\Controllers\Central\Master\RegionsController; 
 use App\Http\Controllers\Central\Master\DistrictController;
-use App\Http\Controllers\Central\Transaction\MocRequestController;
+use App\Http\Controllers\Central\Transaction\MocRequest\MocRequestController;
+use App\Http\Controllers\Central\Transaction\MocRequest\MyMocRequestController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -52,6 +53,12 @@ Route::middleware(['auth', 'is_active'])->group(function (){
         Route::post('/ajax/detail-moc-request/send/{id}', [MocRequestController::class, 'onDetailSendMocRequest'])->name('console-detail-send-moc-request-ajax');
         Route::get('/ajax/get-user', [MocRequestController::class,'onDetailUserApprovalRequest'])->name('central-get-user-approval-line-ajax');
         Route::post('/ajax/get-user-approval', [MocRequestController::class,'getAllUserApprovalRequest'])->name('central-get-user-approval-ajax');
+    });
+
+
+    Route::prefix('/permohonan/saya')->group(function() {
+        Route::get('/', [MyMocRequestController::class, 'index'])->name('central-my-moc-request-index');
+        Route::post('/ajax/get-my-moc-request', [MyMocRequestController::class,'getAllMyMocRequest'])->name('central-get-my-moc-request-ajax');
     });
 
 

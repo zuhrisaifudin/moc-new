@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             ModuleCriteriaSeeder::class,
             ModuleRegionSeeder::class,
             ModuleDistrictSeeder::class,
+            ModuleTransactionMocSeeder::class,
            
 
             DataMasterSeeder::class,

@@ -10,7 +10,7 @@ use App\Models\Permission;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 use Illuminate\Support\Str;
-class UsersTableSeeder extends Seeder
+class UsersTableSeederDum extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,6 +19,20 @@ class UsersTableSeeder extends Seeder
     {
         $faker = Faker::create();
 
+        $positions = [
+            'Senior Expert I, Infrastructure Information System',
+            'Senior Analyst II, Infrastructure Information System',
+            'Junior Assistant IV, Infrastructure Information System',
+            'Expert II, Infrastructure Information System',
+            'Analyst I, Infrastructure Information System',
+            'Assistant III, Infrastructure Information System',
+            'Junior Analyst II, Infrastructure Information System',
+            'Senior Assistant I, Infrastructure Information System',
+            'Junior Expert III, Infrastructure Information System',
+            'Support Staff IV, Infrastructure Information System',
+        ];
+
+
         for ($i = 1; $i <= 100; $i++) {
             $createdAt = $faker->dateTimeBetween('-2 years', 'now');
             
@@ -26,29 +40,10 @@ class UsersTableSeeder extends Seeder
                 'name' => $faker->name,
                 'email' => str_replace('@example.com', '@pgn.co.id', $faker->unique()->safeEmail),
                 'password' => Hash::make('12345678'),
+                'position' => $faker->randomElement($positions),
                 'email_verified_at' => $createdAt,
                 'created_at' => $createdAt,
             ]);
         }
-
-        $userSuperAdmin =User::create([
-            'name' => 'Saifudin Zuhri',
-            'email' => 'zuhrisaifudin57@gmail.com',
-            'password' => bcrypt('MenjadiBintang!@#QWE!'),
-            'email_verified_at'=>'2022-01-02 17:04:58',
-            'is_active' => 1,
-            'remember_token' => null,
-            'created_at' => now(),
-        ]);
-
-        $adminSuperAdminRole =Role::create([
-            'name' => 'Super Administrator',
-            'display_name' => 'Super Administrator',
-            'description' => 'Role Untuk Akun Master',
-            'guard_name' => 'web',
-        ]);
-
-
-        $userSuperAdmin->assignRole($adminSuperAdminRole);
     }
 }

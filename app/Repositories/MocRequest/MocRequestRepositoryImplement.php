@@ -6,6 +6,7 @@ use LaravelEasyRepository\Implementations\Eloquent;
 use App\Models\MocRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 
 class MocRequestRepositoryImplement extends Eloquent implements MocRequestRepository{
 
@@ -32,6 +33,32 @@ class MocRequestRepositoryImplement extends Eloquent implements MocRequestReposi
 
         return $query;
     }
+
+    public function getAllMyMoc(array $filters){
+        $user = Auth::user();
+        if (!$user) {
+            return collect(); // atau return null, tergantung kebutuhan
+        }
+        $query = $this->model->latest()
+        ->where('status', 2)
+        ->whereHas('approvalWorkflows', function ($q) use ($user) {
+            $q->where('user_id', $user->id);
+        });
+
+        if (!empty($filters['search'])) {
+            $query->where(function($q) use ($filters) {
+                $q->where('moc_requests.moc_title', 'LIKE', '%'.$filters['search'].'%')
+                    ->orWhere('moc_requests.moc_number', 'LIKE', '%'.$filters['search'].'%');
+            });
+        }
+
+        if (!empty($filters['is_temporary']) && $filters['is_temporary'] !== 'all') {
+            $query->where('moc_requests.is_temporary', (bool)$filters['is_temporary']);
+        }
+
+        return $query;
+    }
+    
 
     public function getMocRequestById($id){
         return $this->model->findOrFail($id);

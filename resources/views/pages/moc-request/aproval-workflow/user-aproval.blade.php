@@ -46,7 +46,6 @@
             scrollX: true,
             info: false,
             lengthChange: false,
-            paging: false,
         });
     });
 </script>

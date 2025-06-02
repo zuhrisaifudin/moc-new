@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Central\Transaction;
+namespace App\Http\Controllers\Central\Transaction\MocRequest;
 
-use App\Models\User;
+
 use App\Models\Region;
 use App\Models\District;
 use App\Models\MocRequest;
@@ -18,6 +18,8 @@ use App\Repositories\Region\RegionRepository;
 use App\Notifications\MocRequestSentToFuctionRequest;
 use App\Repositories\MocRequest\MocRequestRepository;
 use App\Repositories\User\UserRepository;
+use Illuminate\Support\Facades\Auth;
+use App\Helpers\Common;
 
 class MocRequestController extends Controller
 {
@@ -37,7 +39,13 @@ class MocRequestController extends Controller
 
     public function index(Request $request)
     {
+        if (!$request->user()->can('manage-moc')) {
+            return view('auth-404');
+        }
+
         $data = [];
+        $myMocRequests = Common::getMocWorkflowUser();
+        $data['myMocCount'] = $myMocRequests->where('status', 2)->count();
         $data['total_moc_requests'] = $this->MocRequestRepository->countTotalMocRequest();
  
         return view('pages.moc-request.index')->with($data);
@@ -58,6 +66,7 @@ class MocRequestController extends Controller
                         'id' => Crypt::encryptString($mocRequest->id),
                         'moc_title' => $mocRequest->moc_title ?? '',
                         'status' => $mocRequest->status ?? '',
+                        'role' => Common::getRoleFungsiPengusul(),
                     ]);
                 })
                 ->make(true);
@@ -123,8 +132,10 @@ class MocRequestController extends Controller
             ], 422);
         }
 
+        DB::beginTransaction();
+
         try {
-            $data = $request->except("_token", "reference_document","risk_level_document");
+            $data = $request->except("_token", "reference_document","risk_level_document","user_id");
     
             if ($request->hasFile('reference_document')) {
                 $file = $request->file('reference_document');
@@ -146,12 +157,37 @@ class MocRequestController extends Controller
             $data['type_of_change'] = $request->type_of_change; 
             $data['moc_number'] = $reference;
 
-            $this->MocRequestRepository->createMocRequest($data);
+            $moc = $this->MocRequestRepository->createMocRequest($data);
+            
+    
+            $approvals = [
+                ['role' => 1, 'user_id' => $request->user_id[0] ?? null, 'status' => 'pending'],
+                ['role' => 2, 'user_id' => $request->user_id[1] ?? null, 'status' => 'pending'],
+                ['role' => 3, 'user_id' => $request->user_id[2] ?? null, 'status' => 'pending'],
+                ['role' => 4, 'user_id' => $request->user_id[3] ?? null, 'status' => 'pending'],
+            ];
+
+            foreach ($approvals as $approval) {
+                \App\Models\ApprovalWorkflow::create([
+                    'moc_request_id' => $moc->id,
+                    'user_id' => $approval['user_id'],
+                    'role' => $approval['role'],
+                    'status' => $approval['status'],
+                    'note' => null,
+                    'approved_at' => $approval['status'] === 'approved' ? now() : null,
+                ]);
+            }
+            
+            DB::commit();
             return response()->json([
                 "code" => 1000,
                 "message" => "Permohonan baru berhasil dibuat.",
             ]);
+
+            
+
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error($e->getMessage());
             return response()->json([
                 "code" => 2000,
@@ -162,6 +198,7 @@ class MocRequestController extends Controller
 
     public function getById($id)
     {
+        $id = Crypt::decryptString($id);
         $data['mocRequest'] = $this->MocRequestRepository->getMocRequestById($id);
 
         return view('pages.moc-request.show')->with($data);
@@ -202,6 +239,13 @@ class MocRequestController extends Controller
         try {
             $moc_id = Crypt::decryptString($id);
             $moc = $this->MocRequestRepository->find($moc_id); 
+
+            if (in_array($moc->status, [2, 3, 4])) {
+                return response()->json([
+                    'code' => 2000,
+                    'message' => 'Permohonan tidak dapat dihapus karena sudah berstatus Submission, Approved, atau Rejected.'
+                ], 403);
+            }
             // Cek dan hapus file jika ada cuy 
             if ($moc && $moc->reference_document) {
                 $filePath = str_replace('storage/', '', $moc->reference_document); 

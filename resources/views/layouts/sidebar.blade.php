@@ -51,68 +51,69 @@
                         </ul>
                     </div>
                 </li>
-
+                 @canany(['manage-stage', ' manage-criteria',  'manage-region', ' manage-district'])
                 <li class="menu-title"><i class="ti ti-dots"></i> <span data-key="t-pages">Master</span></li>
 
-                @canany(['manage-stage', ' manage-criteria'])
-                <li class="nav-item">
-                    <a href="#sidebarTahapan" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTahapan">
-                        <i class="ri-route-fill"></i> <span data-key="t-invoices">Form Perubahan</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarTahapan">
-                        <ul class="nav nav-sm flex-column">
-                            @can('manage-stage')
-                            <li class="nav-item">
-                                <a href="{{ route('central-stages-page') }}" class="nav-link" data-key="t-list-stages">Semua Tahapan </a>
-                            </li>
-                            @endcan
-                            @can('manage-criteria')
-                            <li class="nav-item">
-                                <a href="{{ route('central-criteria-page') }}" class="nav-link" data-key="t-list-criteria">Semua Kriteria </a>
-                            </li>
-                            @endcan
-                            @can('manage-description-change')
-                            <li class="nav-item">
-                                <a href="{{ route('central-description-change-page') }}" class="nav-link" data-key="t-list-description-change">Semua Deskripsi </a>
-                            </li>
-                            @endcan
-                        </ul>
-                    </div>
-                </li>
+                    @canany(['manage-stage', ' manage-criteria'])
+                    <li class="nav-item">
+                        <a href="#sidebarTahapan" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTahapan">
+                            <i class="ri-route-fill"></i> <span data-key="t-invoices">Form Perubahan</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="sidebarTahapan">
+                            <ul class="nav nav-sm flex-column">
+                                @can('manage-stage')
+                                <li class="nav-item">
+                                    <a href="{{ route('central-stages-page') }}" class="nav-link" data-key="t-list-stages">Semua Tahapan </a>
+                                </li>
+                                @endcan
+                                @can('manage-criteria')
+                                <li class="nav-item">
+                                    <a href="{{ route('central-criteria-page') }}" class="nav-link" data-key="t-list-criteria">Semua Kriteria </a>
+                                </li>
+                                @endcan
+                                @can('manage-description-change')
+                                <li class="nav-item">
+                                    <a href="{{ route('central-description-change-page') }}" class="nav-link" data-key="t-list-description-change">Semua Deskripsi </a>
+                                </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+                    @endcanany
+                    @canany(['manage-region'])
+                    <li class="nav-item">
+                        <a href="#sidebarRegion" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarRegion">
+                            <i class="ri-open-source-line"></i> <span data-key="t-invoices">Wilayah</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="sidebarRegion">
+                            <ul class="nav nav-sm flex-column">
+                                @can('manage-regions')
+                                <li class="nav-item">
+                                    <a href="{{ route('central-region-page') }}" class="nav-link" data-key="t-list-regions">Semua Wilayah </a>
+                                </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+                    @endcanany
+                    @canany(['manage-district'])
+                    <li class="nav-item">
+                        <a href="#sidebarDistrict" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarDistrict">
+                            <i class=" ri-opera-line"></i> <span data-key="t-invoices">Area</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="sidebarDistrict">
+                            <ul class="nav nav-sm flex-column">
+                                @can('manage-district')
+                                <li class="nav-item">
+                                    <a href="{{ route('central-district-page') }}" class="nav-link" data-key="t-list-district">Semua Area </a>
+                                </li>
+                                @endcan
+                            </ul>
+                        </div>
+                    </li>
+                    @endcanany
                 @endcanany
-                @canany(['manage-region'])
-                <li class="nav-item">
-                    <a href="#sidebarRegion" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarRegion">
-                        <i class="ri-open-source-line"></i> <span data-key="t-invoices">Wilayah</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarRegion">
-                        <ul class="nav nav-sm flex-column">
-                            @can('manage-regions')
-                            <li class="nav-item">
-                                <a href="{{ route('central-region-page') }}" class="nav-link" data-key="t-list-regions">Semua Wilayah </a>
-                            </li>
-                            @endcan
-                        </ul>
-                    </div>
-                </li>
-                @endcanany
-                @canany(['manage-district'])
-                <li class="nav-item">
-                    <a href="#sidebarDistrict" class="nav-link menu-link collapsed" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarDistrict">
-                        <i class=" ri-opera-line"></i> <span data-key="t-invoices">Area</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarDistrict">
-                        <ul class="nav nav-sm flex-column">
-                            @can('manage-district')
-                            <li class="nav-item">
-                                <a href="{{ route('central-district-page') }}" class="nav-link" data-key="t-list-district">Semua Area </a>
-                            </li>
-                            @endcan
-                        </ul>
-                    </div>
-                </li>
-                @endcanany
-
+                @canany(['manage-telescope'])
                 <li class="menu-title"><i class="ti ti-dots"></i> <span data-key="t-setting">Setting</span></li>
 
                 <li class="nav-item">
@@ -128,6 +129,8 @@
                         </ul>
                     </div>
                 </li>
+                @endcanany
+
                 @canany(['manage-user', ' manage-module', ' manage-permission', ' manage-role'])
                 <li class="nav-item">
                     <a class="nav-link menu-link collapsed" href="#sidebarAuthentication" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarAuthentication">
